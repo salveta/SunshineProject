@@ -1,5 +1,6 @@
 package com.example.sunshine.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -35,7 +37,7 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
-    private ArrayAdapter<String> mForecastAdapter;
+    private ArrayAdapter <String> mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -77,8 +79,19 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Add listView
-        ListView listVew = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listVew.setAdapter(mForecastAdapter);
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setAdapter(mForecastAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String text = mForecastAdapter.getItem(position);
+
+                Intent intent = new Intent(getActivity(),DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, text);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
     }
@@ -291,7 +304,7 @@ public class ForecastFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
             FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("94043");
+            weatherTask.execute("WC1");
             return true;
         }
 
