@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,9 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -53,28 +52,12 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
 
-        String[] forecastArray = {
-                "today - Sunny - 88/63",
-                "Tomorrow - Foggy -70/40",
-                "Weds - Cloudy - 72/65",
-                "Thurs - Cloudy - 72/65",
-                "Fri - Cloudy - 72/65",
-                "Sat - Cloudy - 72/65",
-                "Sun - Cloudy - 72/65",
-                "Mon - Sunny - 88/63",
-                "Tues - Foggy -70/40",
-                "Weds - Cloudy - 72/65",
-                "Thurs - Cloudy - 72/65",
-                "Fri - Cloudy - 72/65",
-                "Sat - Cloudy - 72/65",
-                "Sun - Cloudy - 72/65",
-        };
-
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(forecastArray));
 
         //Create the ArrayAdapter to to take the data from a source
-        mForecastAdapter= new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast,
-                R.id.listview_forecast_textView, weekForecast);
+        mForecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast,
+                R.id.listview_forecast_textView, new ArrayList<String>());
+
+
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -90,10 +73,25 @@ public class ForecastFragment extends Fragment {
                 Intent intent = new Intent(getActivity(),DetailActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, text);
                 startActivity(intent);
+
             }
         });
 
         return rootView;
+    }
+
+    private void updateWear(){
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        String location = PreferenceManager.getDefaultSharedPreferences(getActivity())
+              .getString(getString(R.string.pref_location_key),
+                      getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        updateWear();
     }
 
     public class FetchWeatherTask extends AsyncTask <String, Void, String[]> {
@@ -303,8 +301,7 @@ public class ForecastFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            FetchWeatherTask weatherTask = new FetchWeatherTask();
-            weatherTask.execute("WC1");
+            updateWear();
             return true;
         }
 
